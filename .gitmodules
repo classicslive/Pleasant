@@ -1,0 +1,9 @@
+[submodule "QRetro"]
+	path = QRetro
+	url = http://github.com/celerizer/QRetro
+[submodule "classicslive-integration"]
+	path = classicslive-integration
+	url = https://github.com/celerizer/classicslive-integration
+[submodule "libretro-common"]
+	path = libretro-common
+	url = https://github.com/libretro/libretro-common

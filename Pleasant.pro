@@ -8,6 +8,7 @@ CONFIG += c++11
 
 DEFINES += \
   QRETRO_INTERNAL \
+  QRETRO_HAVE_LOCATION=1 \
   CL_LIBRETRO=1 \
   CL_HAVE_EDITOR=1 \
   CL_HAVE_FILESYSTEM=1
@@ -51,6 +52,7 @@ SOURCES += \
   classicslive-integration/editor/cle_script_editor_block.cpp \
   cls_network_manager.cpp \
   cls_thread.cpp \
+  libretro-common/compat/compat_posix_string.c \
   libretro-common/compat/compat_strl.c \
   libretro-common/compat/fopen_utf8.c \
   libretro-common/encodings/encoding_base64.c \
@@ -98,6 +100,19 @@ HEADERS += \
   QRetro/QRetro_global.h \
   QRetro/libretro.h \
   QRetro/libretro_core.h \
+  classicslive-integration/cl_action.h \
+  classicslive-integration/cl_common.h \
+  classicslive-integration/cl_config.h \
+  classicslive-integration/cl_counter.h \
+  classicslive-integration/cl_frontend.h \
+  classicslive-integration/cl_identify.h \
+  classicslive-integration/cl_json.h \
+  classicslive-integration/cl_main.h \
+  classicslive-integration/cl_memory.h \
+  classicslive-integration/cl_network.h \
+  classicslive-integration/cl_script.h \
+  classicslive-integration/cl_search.h \
+  classicslive-integration/cl_types.h \
   classicslive-integration/editor/cle_action_block.h \
   classicslive-integration/editor/cle_action_block_bookend.h \
   classicslive-integration/editor/cle_action_block_ctrbinary.h \

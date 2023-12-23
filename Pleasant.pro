@@ -6,12 +6,24 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
+QMAKE_LFLAGS += -static
+QMAKE_CXXFLAGS += -static-libgcc
+QMAKE_CXXFLAGS += -static-libstdc++
+
 DEFINES += \
   QRETRO_INTERNAL \
   QRETRO_HAVE_LOCATION=1 \
   CL_LIBRETRO=1 \
   CL_HAVE_EDITOR=1 \
   CL_HAVE_FILESYSTEM=1
+
+CONFIG(debug, debug|release) {
+  DEFINES += QRETRO_DRAW_DEBUG=1
+} else {
+  DEFINES += QRETRO_DRAW_DEBUG=0
+}
+
+include(QRetro/external/QMidi/src/QMidi.pri)
 
 SOURCES += \
   Pleasant.cpp \
@@ -22,6 +34,7 @@ SOURCES += \
   QRetro/QRetroEnvironment.cpp \
   QRetro/QRetroLocation.cpp \
   QRetro/QRetroMicrophone.cpp \
+  QRetro/QRetroMidi.cpp \
   QRetro/QRetroOptions.cpp \
   QRetro/QRetroProcAddress.cpp \
   QRetro/QRetroSensors.cpp \
@@ -91,8 +104,10 @@ HEADERS += \
   QRetro/QRetroCommon.h \
   QRetro/QRetroDirectories.h \
   QRetro/QRetroEnvironment.h \
+  QRetro/QRetroLed.h \
   QRetro/QRetroLocation.h \
   QRetro/QRetroMicrophone.h \
+  QRetro/QRetroMidi.h \
   QRetro/QRetroOptions.h \
   QRetro/QRetroProcAddress.h \
   QRetro/QRetroSensors.h \

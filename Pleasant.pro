@@ -1,44 +1,23 @@
-QT += core gui gamepad multimedia positioning sensors
+QT += core gui
 
-LIBS += -lOpengl32
+DEFINES += \
+  QRETRO_INTERNAL=1 \
+  CL_LIBRETRO=1 \
+  CL_HAVE_EDITOR=1 \
+  CL_HAVE_FILESYSTEM=1
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
+include(QRetro/QRetro.pri)
+
 QMAKE_LFLAGS += -static
 QMAKE_CXXFLAGS += -static-libgcc
 QMAKE_CXXFLAGS += -static-libstdc++
 
-DEFINES += \
-  QRETRO_INTERNAL \
-  QRETRO_HAVE_LOCATION=1 \
-  CL_LIBRETRO=1 \
-  CL_HAVE_EDITOR=1 \
-  CL_HAVE_FILESYSTEM=1
-
-CONFIG(debug, debug|release) {
-  DEFINES += QRETRO_DRAW_DEBUG=1
-} else {
-  DEFINES += QRETRO_DRAW_DEBUG=0
-}
-
-include(QRetro/external/QMidi/src/QMidi.pri)
-
 SOURCES += \
   Pleasant.cpp \
-  QRetro/QRetro.cpp \
-  QRetro/QRetroAudio.cpp \
-  QRetro/QRetroCommon.cpp \
-  QRetro/QRetroDirectories.cpp \
-  QRetro/QRetroEnvironment.cpp \
-  QRetro/QRetroLocation.cpp \
-  QRetro/QRetroMicrophone.cpp \
-  QRetro/QRetroMidi.cpp \
-  QRetro/QRetroOptions.cpp \
-  QRetro/QRetroProcAddress.cpp \
-  QRetro/QRetroSensors.cpp \
-  QRetro/QRetroUsername.cpp \
   cl_frontend.cpp \
   classicslive-integration/cl_action.c \
   classicslive-integration/cl_common.c \
@@ -91,30 +70,12 @@ SOURCES += \
   mainwindow.cpp
 
 INCLUDEPATH += \
-  $$PWD/QRetro \
   $$PWD/classicslive-integration \
   $$PWD/classicslive-integration/editor \
   $$PWD/libretro-common/include
 
 HEADERS += \
   Pleasant.h \
-  QRetro/QRetro.h \
-  QRetro/QRetroAudio.h \
-  QRetro/QRetroAudioVideoEnable.h \
-  QRetro/QRetroCommon.h \
-  QRetro/QRetroDirectories.h \
-  QRetro/QRetroEnvironment.h \
-  QRetro/QRetroLed.h \
-  QRetro/QRetroLocation.h \
-  QRetro/QRetroMicrophone.h \
-  QRetro/QRetroMidi.h \
-  QRetro/QRetroOptions.h \
-  QRetro/QRetroProcAddress.h \
-  QRetro/QRetroSensors.h \
-  QRetro/QRetroUsername.h \
-  QRetro/QRetro_global.h \
-  QRetro/libretro.h \
-  QRetro/libretro_core.h \
   classicslive-integration/cl_action.h \
   classicslive-integration/cl_common.h \
   classicslive-integration/cl_config.h \

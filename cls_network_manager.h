@@ -19,7 +19,6 @@ public:
   ClsNetworkManager();
 
 signals:
-  void finished(QNetworkReply* reply);
   void request(const char *url, char *data, cls_net_cb callback);
 
 public slots:

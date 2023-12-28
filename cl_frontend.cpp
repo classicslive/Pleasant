@@ -16,8 +16,6 @@ extern "C"
 #include "cls_network_manager.h"
 #include "cls_thread.h"
 
-static ClsNetworkManager network_manager;
-
 static Pleasant* _plthis(void)
 {
   return reinterpret_cast<Pleasant*>(_qrthis());
@@ -78,8 +76,13 @@ void cl_fe_unpause(void)
 
 void cl_fe_network_post(const char *url, char *data, void(*callback)(cl_network_response_t))
 {
-  cls_net_cb cb = { callback };
-  emit network_manager.request(url, data, cb);
+  auto _this = _plthis();
+
+  if (_this)
+  {
+    cls_net_cb cb = { callback };
+    emit _this->networkManager()->request(url, data, cb);
+  }
 }
 
 void cl_fe_thread(cl_task_t *task)

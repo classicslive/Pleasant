@@ -14,6 +14,7 @@ public:
 public slots:
   int createRetro(const QString& core, const QString& content);
   int createRetroDialog(void);
+  void onFrame(void);
 };
 
 #endif

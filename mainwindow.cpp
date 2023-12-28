@@ -24,6 +24,11 @@ MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::onFrame(void)
+{
+  cl_run();
+}
+
 int MainWindow::createRetro(const QString& core, const QString& content)
 {
   Pleasant *retro = new Pleasant();
@@ -32,14 +37,15 @@ int MainWindow::createRetro(const QString& core, const QString& content)
   retro->directories()->set(QRetroDirectories::System, "D:\\RetroArch\\system");
   if (!retro->loadCore(core.toStdString().c_str()))
     return 1;
-  if (!retro->loadContent(content.toStdString().c_str()))
+  if (!content.isEmpty() && !retro->loadContent(content.toStdString().c_str()))
     return 2;
   if (!retro->startCore())
     return 3;
-  retro->setTitle(retro->username()->get());
+  retro->setTitle(retro->core()->system_info.library_name);
   retro->show();
 
   cl_init(nullptr, 0, content.toStdString().c_str());
+  connect(retro, SIGNAL(onFrame(void)), this, SLOT(onFrame(void)));
 
   return 0;
 }
@@ -49,22 +55,24 @@ int MainWindow::createRetro(const QString& core, const QString& content)
 
 int MainWindow::createRetroDialog(void)
 {
-  QFileDialog dialog(this);
+  QFileDialog core_dialog(this);
+  QFileDialog content_dialog(this);
   QString core, content = "";
 
-  dialog.setFileMode(QFileDialog::ExistingFile);
-  dialog.setNameFilter(tr("libretro cores (*.dll)"));
-  dialog.exec();
-  if (!dialog.selectedFiles().size())
+  core_dialog.setFileMode(QFileDialog::ExistingFile);
+  core_dialog.setNameFilter(tr("libretro cores (*.dll)"));
+  core_dialog.exec();
+  if (!core_dialog.selectedFiles().size())
     return 1;
-  core = dialog.selectedFiles()[0];
+  core = core_dialog.selectedFiles()[0];
 
-  dialog.setDirectory(core);
-  dialog.setNameFilter(tr("Any content file (*)"));
-  dialog.exec();
-  if (!dialog.selectedFiles().size())
-    return 1;
-  content = dialog.selectedFiles()[0];
+  content_dialog.setDirectory(core);
+  content_dialog.setNameFilter(tr("Any content file (*)"));
+  content_dialog.exec();
+  if (!content_dialog.selectedFiles().size())
+    content = "";
+  else
+    content = content_dialog.selectedFiles()[0];
 
   return createRetro(core, content);
 }

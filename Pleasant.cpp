@@ -7,7 +7,7 @@ extern "C"
 
 bool Pleasant::installMembanks(void)
 {
-  if (!memoryMaps())
+  if (!memoryMaps()->descriptors || !memoryMaps()->num_descriptors)
   {
     memory.banks = static_cast<cl_membank_t*>(calloc(1, sizeof(cl_membank_t)));
     memory.banks[0].data = reinterpret_cast<uint8_t*>(core()->retro_get_memory_data(RETRO_MEMORY_SYSTEM_RAM));
@@ -20,9 +20,18 @@ bool Pleasant::installMembanks(void)
   }
   else
   {
-    auto descs = memoryMaps()->descriptors;
+    const struct retro_memory_descriptor **descs =
+      static_cast<const struct retro_memory_descriptor**>(
+        calloc(memoryMaps()->num_descriptors, sizeof(*descs)));
+    bool success;
+    unsigned i;
 
-    return cl_init_membanks_libretro(&descs, memoryMaps()->num_descriptors);
+    for (i = 0; i < memoryMaps()->num_descriptors; i++)
+       descs[i] = &memoryMaps()->descriptors[i];
+    success = cl_init_membanks_libretro(descs, memoryMaps()->num_descriptors);
+    free(descs);
+
+    return success;
   }
 }
 

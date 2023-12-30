@@ -60,7 +60,11 @@ int MainWindow::createRetroDialog(void)
   QString core, content = "";
 
   core_dialog.setFileMode(QFileDialog::ExistingFile);
+#ifdef _WIN32
   core_dialog.setNameFilter(tr("libretro cores (*.dll)"));
+#else
+  core_dialog.setNameFilter(tr("libretro cores (*.so)"));
+#endif
   core_dialog.exec();
   if (!core_dialog.selectedFiles().size())
     return 1;

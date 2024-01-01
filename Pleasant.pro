@@ -12,9 +12,11 @@ CONFIG += c++11
 
 include(QRetro/QRetro.pri)
 
-QMAKE_LFLAGS += -static
-QMAKE_CXXFLAGS += -static-libgcc
-QMAKE_CXXFLAGS += -static-libstdc++
+win32 {
+  QMAKE_LFLAGS += -static
+  QMAKE_CXXFLAGS += -static-libgcc
+  QMAKE_CXXFLAGS += -static-libstdc++
+}
 
 SOURCES += \
   Pleasant.cpp \

@@ -2,6 +2,9 @@
 
 #include <QFileDialog>
 #include <QMenuBar>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QSettings>
 
 extern "C"
 {
@@ -15,7 +18,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
   auto action_load = new QAction(tr("&Load core and content"), this);
   connect(action_load, SIGNAL(triggered()), this, SLOT(createRetroDialog()));
   auto menu_file = menuBar()->addMenu(tr("&File"));
+
+  QSettings settings(QDir::currentPath() + "/history.ini", QSettings::IniFormat);
+  auto history = settings.value("history").toJsonArray();
   auto menu_history = menu_file->addMenu(tr("History"));
+  for (const auto history_entry : history)
+  {
+    if (history_entry.isObject())
+    {
+      const QJsonObject& entry = history_entry.toObject();
+      QString core = entry.value("core_path").toString();
+      QString content = entry.value("content_path").toString();
+      QString core_name = entry.value("core_name").toString();
+      QString item_text = tr("%1 (%2)").arg(QFileInfo(content).baseName(), core_name);
+
+      QAction* history_action = new QAction(item_text, menu_history);
+      menu_history->addAction(history_action);
+      connect(history_action, &QAction::triggered, [=]() { createRetro(core, content); });
+    }
+  }
 
   menu_file->addAction(action_load);
 }
@@ -33,6 +54,10 @@ int MainWindow::createRetro(const QString& core, const QString& content)
 {
   Pleasant *retro = new Pleasant();
 
+  QSettings settings(QDir::currentPath() + "/history.ini", QSettings::IniFormat);
+  auto classicslive = settings.value("classicslive", false).toBool();
+  auto history = settings.value("history").toJsonArray();
+
   retro->username()->setFromApplication();
   retro->directories()->set(QRetroDirectories::System, "D:\\RetroArch\\system");
   if (!retro->loadCore(core.toStdString().c_str()))
@@ -44,8 +69,31 @@ int MainWindow::createRetro(const QString& core, const QString& content)
   retro->setTitle(retro->core()->system_info.library_name);
   retro->show();
 
-  cl_init(nullptr, 0, content.toStdString().c_str());
-  connect(retro, SIGNAL(onFrame(void)), this, SLOT(onFrame(void)));
+  QJsonObject history_entry;
+  history_entry["core_path"] = core;
+  history_entry["content_path"] = content;
+  history_entry["core_name"] = retro->core()->system_info.library_name;
+  bool new_content = true;
+  for (const auto entry : history)
+  {
+    if (entry.toObject().value("content_path").toString() == content)
+    {
+      new_content = false;
+      break;
+    }
+  }
+  if (new_content)
+  {
+    history.append(history_entry);
+    settings.setValue("history", history);
+    settings.sync();
+  }
+
+  if (classicslive)
+  {
+    cl_init(nullptr, 0, content.toStdString().c_str());
+    connect(retro, SIGNAL(onFrame(void)), this, SLOT(onFrame(void)));
+  }
 
   return 0;
 }

@@ -55,7 +55,7 @@ int MainWindow::createRetro(const QString& core, const QString& content)
   Pleasant *retro = new Pleasant();
 
   QSettings settings(QDir::currentPath() + "/history.ini", QSettings::IniFormat);
-  auto classicslive = settings.value("classicslive", false).toBool();
+  auto classicslive = settings.value("classicslive", true).toBool();
   auto history = settings.value("history").toJsonArray();
 
   retro->username()->setFromApplication();

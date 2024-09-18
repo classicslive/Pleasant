@@ -9,12 +9,12 @@ bool Pleasant::installMembanks(void)
 {
   if (!memoryMaps()->descriptors || !memoryMaps()->num_descriptors)
   {
-    memory.banks = static_cast<cl_membank_t*>(calloc(1, sizeof(cl_membank_t)));
-    memory.banks[0].data = reinterpret_cast<uint8_t*>(core()->retro_get_memory_data(RETRO_MEMORY_SYSTEM_RAM));
-    memory.banks[0].size = core()->retro_get_memory_size(RETRO_MEMORY_SYSTEM_RAM);
-    memory.banks[0].start = 0;
-    snprintf(memory.banks[0].title, sizeof(memory.banks[0].title), "%s", "RETRO_MEMORY_SYSTEM_RAM");
-    memory.bank_count = 1;
+    memory.regions = static_cast<cl_memory_region_t*>(calloc(1, sizeof(cl_memory_region_t)));
+    memory.regions[0].base_guest = 0;
+    memory.regions[0].base_host = reinterpret_cast<uint8_t*>(core()->retro_get_memory_data(RETRO_MEMORY_SYSTEM_RAM));
+    memory.regions[0].size = core()->retro_get_memory_size(RETRO_MEMORY_SYSTEM_RAM);
+    snprintf(memory.regions[0].title, sizeof(memory.regions[0].title), "%s", "RETRO_MEMORY_SYSTEM_RAM");
+    memory.region_count = 1;
 
     return true;
   }

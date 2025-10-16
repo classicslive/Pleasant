@@ -19,11 +19,11 @@ public:
   ClsNetworkManager();
 
 signals:
-  void request(const char *url, char *data, cls_net_cb callback);
+  void request(QString url, QString data, cls_net_cb callback);
 
 public slots:
   void onFinished(QNetworkReply *reply);
-  void onRequest(const char *url, char *data, cls_net_cb callback);
+  void onRequest(QString url, QString data, cls_net_cb callback);
 
 private:
   std::map<QNetworkReply*, cls_net_cb> m_Requests;

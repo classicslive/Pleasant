@@ -91,7 +91,15 @@ int MainWindow::createRetro(const QString& core, const QString& content)
 
   if (classicslive)
   {
-    cl_init(nullptr, 0, content.toStdString().c_str());
+    cl_game_identifier_t identifier;
+
+    static char filename[1024];
+    snprintf(filename, sizeof(filename), "%s", content.toStdString().c_str());
+
+    memset(&identifier, 0, sizeof(identifier));
+    identifier.filename = filename;
+    identifier.type = CL_GAMEIDENTIFIER_FILE_HASH;
+    cl_login_and_start(identifier);
     connect(retro, SIGNAL(onFrame(void)), this, SLOT(onFrame(void)));
   }
 

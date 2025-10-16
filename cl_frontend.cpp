@@ -81,7 +81,9 @@ void cl_fe_network_post(const char *url, char *data, void(*callback)(cl_network_
   if (_this)
   {
     cls_net_cb cb = { callback };
-    emit _this->networkManager()->request(url, data, cb);
+    QString url_string = QString(url);
+    QString data_string = QString(data);
+    emit _this->networkManager()->request(url_string, data_string, cb);
   }
 }
 
@@ -94,9 +96,10 @@ void cl_fe_thread(cl_task_t *task)
 bool cl_fe_user_data(cl_user_t *user, unsigned index)
 {
   CL_UNUSED(index);
-  snprintf(user->username, sizeof(user->username), "%s", "jacory");
-  snprintf(user->password, sizeof(user->password), "%s", "jacory");
+  snprintf(user->username, sizeof(user->username), "%s", "keith");
+  snprintf(user->token, sizeof(user->token), "%s", "#C5JOfzkl6rNnzFIKJ9IOsAFm4rvjbV");
   snprintf(user->language, sizeof(user->language), "%s", "en_US");
+  user->password[0] = '\0';
 
   return true;
 }

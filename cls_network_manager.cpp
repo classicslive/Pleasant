@@ -16,8 +16,8 @@ ClsNetworkManager::ClsNetworkManager()
   qRegisterMetaType<cls_net_cb>();
   connect(this, SIGNAL(finished(QNetworkReply*)),
           this, SLOT(onFinished(QNetworkReply*)));
-  connect(this, SIGNAL(request(const char*, char*, cls_net_cb)),
-          this, SLOT(onRequest(const char*, char*, cls_net_cb)));
+  connect(this, SIGNAL(request(QString, QString, cls_net_cb)),
+          this, SLOT(onRequest(QString, QString, cls_net_cb)));
 }
 
 void ClsNetworkManager::onFinished(QNetworkReply *reply)
@@ -28,18 +28,15 @@ void ClsNetworkManager::onFinished(QNetworkReply *reply)
   response.error_code = reply->error();
   response.error_msg = reply->errorString().toStdString().c_str();
 
-  if (response.error_code)
-    cl_fe_display_message(CL_MSG_ERROR, response.error_msg);
-
   QByteArray response_array = reply->readAll();
   response.data = response_array.data();
 
   bool success;
-  if (cl_json_get(&success, response.data, "success", CL_JSON_BOOLEAN, 1) && !success)
+  if (cl_json_get(&success, response.data, "success", CL_JSON_TYPE_BOOLEAN, sizeof(bool)) && !success)
   {
     char reason[2048];
 
-    if (cl_json_get(reason, response.data, "reason", CL_JSON_STRING, sizeof(reason)))
+    if (cl_json_get(reason, response.data, "reason", CL_JSON_TYPE_STRING, sizeof(reason)))
       cl_fe_display_message(CL_MSG_ERROR, reason);
     else
       cl_fe_display_message(CL_MSG_ERROR, "Unknown network error.");
@@ -51,7 +48,7 @@ void ClsNetworkManager::onFinished(QNetworkReply *reply)
   m_Requests.erase(reply);
 }
 
-void ClsNetworkManager::onRequest(const char *url, char *data, cls_net_cb callback)
+void ClsNetworkManager::onRequest(QString url, QString data, cls_net_cb callback)
 {
   QUrl url_data = QUrl(url);
   if (!url_data.isValid())
@@ -64,8 +61,6 @@ void ClsNetworkManager::onRequest(const char *url, char *data, cls_net_cb callba
 
   QByteArray post_data;
   post_data.append(data);
-
-  free(data);
 
   QNetworkReply *reply = post(request, post_data);
   m_Requests.insert(std::pair<QNetworkReply*, cls_net_cb>(reply, callback));

@@ -4,7 +4,8 @@ DEFINES += \
   QRETRO_INTERNAL=1 \
   CL_LIBRETRO=1 \
   CL_HAVE_EDITOR=1 \
-  CL_HAVE_FILESYSTEM=1
+  CL_HAVE_FILESYSTEM=1 \
+  CL_HAVE_SSL=0
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -32,8 +33,12 @@ SOURCES += \
   classicslive-integration/cl_script.c \
   classicslive-integration/cl_search.c \
   classicslive-integration/editor/cle_action_block.cpp \
+  classicslive-integration/editor/cle_action_block_api.cpp \
   classicslive-integration/editor/cle_action_block_bookend.cpp \
+  classicslive-integration/editor/cle_action_block_comparison.cpp \
   classicslive-integration/editor/cle_action_block_ctrbinary.cpp \
+  classicslive-integration/editor/cle_action_block_ctrunary.cpp \
+  classicslive-integration/editor/cle_action_block_nop.cpp \
   classicslive-integration/editor/cle_common.cpp \
   classicslive-integration/editor/cle_hex_view.cpp \
   classicslive-integration/editor/cle_main.cpp \
@@ -44,6 +49,7 @@ SOURCES += \
   classicslive-integration/editor/cle_result_table_pointer.cpp \
   classicslive-integration/editor/cle_script_editor.cpp \
   classicslive-integration/editor/cle_script_editor_block.cpp \
+  classicslive-integration/editor/cle_script_editor_block_canvas.cpp \
   cls_network_manager.cpp \
   cls_thread.cpp \
   libretro-common/compat/compat_posix_string.c \
@@ -90,10 +96,15 @@ HEADERS += \
   classicslive-integration/cl_network.h \
   classicslive-integration/cl_script.h \
   classicslive-integration/cl_search.h \
+  classicslive-integration/cl_search_new.h \
   classicslive-integration/cl_types.h \
   classicslive-integration/editor/cle_action_block.h \
+  classicslive-integration/editor/cle_action_block_api.h \
   classicslive-integration/editor/cle_action_block_bookend.h \
+  classicslive-integration/editor/cle_action_block_comparison.h \
   classicslive-integration/editor/cle_action_block_ctrbinary.h \
+  classicslive-integration/editor/cle_action_block_ctrunary.h \
+  classicslive-integration/editor/cle_action_block_nop.h \
   classicslive-integration/editor/cle_common.h \
   classicslive-integration/editor/cle_hex_view.h \
   classicslive-integration/editor/cle_main.h \
@@ -104,6 +115,7 @@ HEADERS += \
   classicslive-integration/editor/cle_result_table_pointer.h \
   classicslive-integration/editor/cle_script_editor.h \
   classicslive-integration/editor/cle_script_editor_block.h \
+  classicslive-integration/editor/cle_script_editor_block_canvas.h \
   cls_network_manager.h \
   cls_thread.h \
   mainwindow.h

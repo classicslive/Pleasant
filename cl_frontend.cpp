@@ -74,13 +74,14 @@ void cl_fe_unpause(void)
     _this->unpause();
 }
 
-void cl_fe_network_post(const char *url, char *data, void(*callback)(cl_network_response_t))
+void cl_fe_network_post(const char *url, char *data, cl_network_cb_t callback,
+                        void *userdata)
 {
   auto _this = _plthis();
 
   if (_this)
   {
-    cls_net_cb cb = { callback };
+    cls_net_cb cb = { callback, userdata };
     QString url_string = QString(url);
     QString data_string = QString(data);
     emit _this->networkManager()->request(url_string, data_string, cb);

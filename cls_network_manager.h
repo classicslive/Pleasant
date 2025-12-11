@@ -7,7 +7,8 @@
 
 typedef struct
 {
-  void(*function)(cl_network_response_t);
+  cl_network_cb_t function;
+  void *userdata;
 } cls_net_cb;
 Q_DECLARE_METATYPE(cls_net_cb);
 

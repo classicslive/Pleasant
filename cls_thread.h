@@ -5,7 +5,7 @@
 
 extern "C"
 {
-  #include <cl_frontend.h>
+  #include <cl_abi.h>
 }
 
 class ClsThread : public QThread

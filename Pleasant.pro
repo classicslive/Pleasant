@@ -1,4 +1,4 @@
-QT += core gui
+QT += core gui network
 
 DEFINES += \
   QRETRO_INTERNAL=1 \
@@ -9,13 +9,13 @@ DEFINES += \
 
 CONFIG += QRETRO_CONFIG_NO_MIDI
 
-include(classicslive-integration/classicslive-integration.pri)
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
 include(QRetro/QRetro.pri)
+
+include(classicslive-integration/classicslive-integration.pri)
 
 win32 {
   QMAKE_LFLAGS += -static
@@ -32,9 +32,9 @@ SOURCES += \
   mainwindow.cpp
 
 INCLUDEPATH += \
+  $$PWD/libretro-common/include \
   $$PWD/classicslive-integration \
-  $$PWD/classicslive-integration/editor \
-  $$PWD/libretro-common/include
+  $$PWD/classicslive-integration/editor
 
 HEADERS += \
   Pleasant.h \

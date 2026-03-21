@@ -10,12 +10,18 @@ typedef struct
 
 } cl_ctx_t;
 
+cl_error cls_abi_register(void);
+
 class Pleasant : public QRetro
 {
 public:
-  const cl_ctx_t* clCtx() { return &m_ClCtx; }
-  bool installMembanks(void);
-  const char* libraryName(void);
+  const cl_ctx_t* clCtx(void) { return &m_ClCtx; }
+
+  cl_error installMemoryRegions(cl_memory_region_t **regions,
+                                unsigned *region_count);
+
+  cl_error libraryName(const char **name);
+
   ClsNetworkManager *networkManager(void) { return &m_NetworkManager; }
 
 private:

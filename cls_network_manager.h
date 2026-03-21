@@ -3,7 +3,7 @@
 
 #include <QNetworkAccessManager>
 
-#include <cl_frontend.h>
+#include <cl_abi.h>
 
 typedef struct
 {

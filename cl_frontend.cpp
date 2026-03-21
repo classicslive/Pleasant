@@ -1,14 +1,16 @@
+#include <QDir>
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QSettings>
 #include <QTimer>
 
 extern "C"
 {
+  #include <cl_abi.h>
   #include <cl_common.h>
   #include <cl_main.h>
   #include <cl_memory.h>
 }
-#include <cl_frontend.h>
 
 #include <QRetroCommon.h>
 
@@ -21,7 +23,7 @@ static Pleasant* _plthis(void)
   return reinterpret_cast<Pleasant*>(_qrthis());
 }
 
-void cl_fe_display_message(unsigned level, const char *msg)
+static cl_error cls_abi_display_message(unsigned level, const char *msg)
 {
   QMessageBox msg_box;
 
@@ -42,40 +44,33 @@ void cl_fe_display_message(unsigned level, const char *msg)
     msg_box.setIcon(QMessageBox::Question);
   }
   msg_box.exec();
+
+  return CL_OK;
 }
 
-bool cl_fe_install_membanks(void)
-{
-  auto _this = _plthis();
-
-  return _this && _this->installMembanks();
-}
-
-const char* cl_fe_library_name(void)
-{
-  auto _this = _plthis();
-
-  return _this ? _this->libraryName() : nullptr;
-}
-
-void cl_fe_pause(void)
+static cl_error cls_abi_install_memory_regions(cl_memory_region_t **regions,
+  unsigned *region_count)
 {
   auto _this = _plthis();
 
   if (_this)
-    _this->pause();
+    return _this->installMemoryRegions(regions, region_count);
+  else
+    return CL_ERR_PARAMETER_NULL;
 }
 
-void cl_fe_unpause(void)
+static cl_error cls_abi_library_name(const char **name)
 {
   auto _this = _plthis();
 
   if (_this)
-    _this->unpause();
+    return _this->libraryName(name);
+  else
+    return CL_ERR_PARAMETER_NULL;
 }
 
-void cl_fe_network_post(const char *url, char *data, cl_network_cb_t callback,
-                        void *userdata)
+static cl_error cls_abi_network_post(const char *url, char *data,
+  cl_network_cb_t callback, void *userdata)
 {
   auto _this = _plthis();
 
@@ -85,22 +80,77 @@ void cl_fe_network_post(const char *url, char *data, cl_network_cb_t callback,
     QString url_string = QString(url);
     QString data_string = QString(data);
     emit _this->networkManager()->request(url_string, data_string, cb);
+
+    return CL_OK;
+  }
+  else
+    return CL_ERR_PARAMETER_NULL;
+}
+
+static cl_error cls_abi_set_pause(unsigned mode)
+{
+  auto _this = _plthis();
+
+  if (!_this)
+    return CL_ERR_PARAMETER_NULL;
+  else
+  {
+    if (mode)
+      _this->pause();
+    else
+      _this->unpause();
+
+    return CL_OK;
   }
 }
 
-void cl_fe_thread(cl_task_t *task)
+static cl_error cls_abi_thread(cl_task_t *task)
 {
-  auto *thread = new ClsThread(task);
-  thread->start();
+  if (!task)
+    return CL_ERR_PARAMETER_NULL;
+  else
+  {
+    auto *thread = new ClsThread(task);
+    thread->start();
+  }
+
+  return CL_OK;
 }
 
-bool cl_fe_user_data(cl_user_t *user, unsigned index)
+static cl_error cls_abi_user_data(cl_user_t *user, unsigned index)
 {
   CL_UNUSED(index);
-  snprintf(user->username, sizeof(user->username), "%s", "keith");
-  snprintf(user->token, sizeof(user->token), "%s", "#C5JOfzkl6rNnzFIKJ9IOsAFm4rvjbV");
-  snprintf(user->language, sizeof(user->language), "%s", "en_US");
-  user->password[0] = '\0';
 
-  return true;
+  QSettings settings(QDir::currentPath() + "/history.ini", QSettings::IniFormat);
+  QByteArray username = settings.value("clsUsername", "").toString().toUtf8();
+  QByteArray password = settings.value("clsPassword", "").toString().toUtf8();
+
+  snprintf(user->username, sizeof(user->username), "%s", username.constData());
+  snprintf(user->password, sizeof(user->password), "%s", password.constData());
+  snprintf(user->language, sizeof(user->language), "%s", "en_US");
+  user->token[0] = '\0';
+
+  return CL_OK;
+}
+
+const cl_abi_t cls_abi
+{
+  CL_ABI_VERSION,
+  {
+    {
+      cls_abi_display_message,
+      cls_abi_install_memory_regions,
+      cls_abi_library_name,
+      cls_abi_network_post,
+      cls_abi_set_pause,
+      cls_abi_thread,
+      cls_abi_user_data
+    },
+    { NULL, NULL, NULL, NULL }
+  }
+};
+
+cl_error cls_abi_register(void)
+{
+  return cl_abi_register(&cls_abi);
 }

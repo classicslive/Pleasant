@@ -1,15 +1,14 @@
-#include <QJsonArray>
-#include <QNetworkReply>
-
-#include <cl_frontend.h>
-
 extern "C"
 {
+  #include <cl_abi.h>
   #include <cl_common.h>
   #include <cl_json.h>
 }
 
 #include "cls_network_manager.h"
+
+#include <QJsonArray>
+#include <QNetworkReply>
 
 ClsNetworkManager::ClsNetworkManager()
 {
@@ -31,20 +30,22 @@ void ClsNetworkManager::onFinished(QNetworkReply *reply)
   response.data = response_array.data();
 
   bool success;
-  if (cl_json_get(&success, response.data, CL_JSON_KEY_SUCCESS, CL_JSON_TYPE_BOOLEAN, sizeof(bool)))
+  if (cl_json_get(&success, response.data, CL_JSON_KEY_SUCCESS, CL_JSON_TYPE_BOOLEAN, sizeof(bool)) == CL_OK)
   {
     if (!success)
     {
       char reason[2048];
 
-      if (cl_json_get(reason, response.data, CL_JSON_KEY_REASON, CL_JSON_TYPE_STRING, sizeof(reason)))
-        cl_fe_display_message(CL_MSG_ERROR, reason);
+      if (cl_json_get(reason, response.data, CL_JSON_KEY_REASON,
+                      CL_JSON_TYPE_STRING, sizeof(reason)) == CL_OK)
+        cl_abi_display_message(CL_MSG_ERROR, reason);
       else
-        cl_fe_display_message(CL_MSG_ERROR, "Request failed with no given reason.");
+        cl_abi_display_message(CL_MSG_ERROR, "Request failed with no given reason.");
     }
   }
   else
-    cl_fe_display_message(CL_MSG_ERROR, reply->errorString().toStdString().c_str());
+    cl_abi_display_message(CL_MSG_ERROR,
+                           reply->errorString().toStdString().c_str());
 
   if (cb.function)
     cb.function(response, cb.userdata);
@@ -62,9 +63,9 @@ void ClsNetworkManager::onRequest(QString url, QString data, cls_net_cb callback
   request.setHeader(QNetworkRequest::ContentTypeHeader,
                     QStringLiteral("application/x-www-form-urlencoded"));
 #ifdef GIT_VERSION
-  request.setRawHeader("User-Agent", QStringLiteral("classicslive-standalone %1").arg(GIT_VERSION).toUtf8());
+  request.setRawHeader("User-Agent", QStringLiteral("Pleasant %1").arg(GIT_VERSION).toUtf8());
 #else
-  request.setRawHeader("User-Agent", "classicslive-standalone");
+  request.setRawHeader("User-Agent", "Pleasant");
 #endif
   request.setUrl(QUrl(url));
 
